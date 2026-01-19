@@ -12,18 +12,21 @@ jobs:
       - name: Deploy on Server
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USER }}
+          host: 192.168.1.25          # SERVER IP
+          username: kalbi             # SERVER USER
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
           script: |
             set -e
-            cd ~/kalbi-testing
+
+            echo "📂 Move to project directory"
+            cd /home/kalbi/kalbi-testing
 
             echo "🔄 Pull latest code"
             git pull origin main
 
-            echo "🐳 Build new images (no cache)"
-            docker-compose build --no-cache
+            echo "🐳 Build docker images (no cache)"
+            sudo docker-compose build --no-cache
 
-            echo "🚀 Start containers (zero-downtime style)"
-            docker-compose up -d
+            echo "🚀 Start / Update containers"
+            sudo docker-compose up -d
