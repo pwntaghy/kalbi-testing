@@ -9,16 +9,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Deploy on Server
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.SERVER_IP }}
-        username: ${{ secrets.SERVER_USER }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script: |
-          cd ~/kalbi-testing
-          git pull origin main
+      - name: Deploy on Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            cd ~/kalbi-testing
 
-          docker-compose down
-          docker-compose build
-          docker-compose up -d
+            echo "🔄 Pull latest code"
+            git pull origin main
+
+            echo "🐳 Build new images (no cache)"
+            docker-compose build --no-cache
+
+            echo "🚀 Start containers (zero-downtime style)"
+            docker-compose up -d
