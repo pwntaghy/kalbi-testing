@@ -1,0 +1,170 @@
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import api from "./utils/axiosInstance";
+const Register = () => {
+  const navigate = useNavigate();
+  const [register, setRegister] = useState({
+    fname: "",
+    lname: "",
+    email: "",
+    number: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const handleChange = (e) => {
+    setRegister({
+      ...register,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (register.password !== register.confirmPassword) {
+      toast("Password do not match");
+      return;
+    }
+    try {
+      const res = await api.post("/api/v1/auth/register", {
+        fname: register.fname,
+        lname: register.lname,
+        email: register.email,
+        number: register.number,
+        password: register.password,
+      });
+      console.log("response for registration", res.data);
+      if (res.data.success) {
+        toast.success(res.data.message);
+        navigate("/login");
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch (error) {
+      console.log("error in registration", error);
+      toast.error("something went wrong");
+    }
+  };
+  return (
+    <>
+      <section className="py-20 bg-black text-white">
+        <div className="px-6">
+          <div className="border border-neutral-900 max-w-5xl mx-auto px-4 sm:px-6 md:px-6 py-6 md:py-10 bg-neutral-900 rounded-2xl">
+            <h2 className="text-4xl font-bold mb-7 text-center text-indigo-500">
+              Kalbii Global PVT LTD
+            </h2>
+            <h3 className="text-center text-2xl mb-2">Register Your Account</h3>
+            <form onSubmit={handleSubmit} className="space-y-10">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <label className="text-gray-300 text-md">First Name</label>
+                  <input
+                    className="mt-2 w-full px-4 py-3 bg-[#111] border border-neutral-700 rounded-lg focus:border-indigo-500 outline-none"
+                    placeholder="First Name"
+                    type="text"
+                    name="fname"
+                    id="fname"
+                    value={register.fname}
+                    required
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <label className="text-gray-300 text-md">Last Name</label>
+                  <input
+                    placeholder="Last Name"
+                    className="w-full mt-2 px-4 py-3 bg-[#111] border border-neutral-700 rounded-lg focus:border-indigo-500 outline-none"
+                    required
+                    type="text"
+                    name="lname"
+                    id="lname"
+                    value={register.lname}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <label className="text-gray-300 text-md">Email Id</label>
+                  <input
+                    className="mt-2 w-full px-4 py-3 bg-[#111] border border-neutral-700 rounded-lg focus:border-indigo-500 outline-none"
+                    placeholder="Email"
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={register.email}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-gray-300 text-md">Mobile Number</label>
+                  <input
+                    className="mt-2 w-full px-4 py-3 bg-[#111] border border-neutral-700 rounded-lg focus:border-indigo-500 outline-none"
+                    placeholder="Mobile Number"
+                    type="number"
+                    id="number"
+                    name="number"
+                    value={register.number}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <label className="text-gray-300 text-md">Password</label>
+                  <input
+                    className="mt-2 w-full px-4 py-3 bg-[#111] border border-neutral-700 rounded-lg focus:border-indigo-500 outline-none"
+                    placeholder="Password"
+                    type="password"
+                    id="password"
+                    name="password"
+                    value={register.password}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-gray-300 text-md">
+                    Confirm Password
+                  </label>
+                  <input
+                    className="mt-2 w-full px-4 py-3 bg-[#111] border border-neutral-700 rounded-lg focus:border-indigo-500 outline-none"
+                    placeholder="Confirm Password"
+                    type="password"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    value={register.confirmPassword}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </div>
+              <div>
+                <button
+                  type="submit"
+                  className="mx-auto block min-w-32 bg-indigo-600 hover:bg-indigo-700 transition transform-300 cursor-pointer text-white foucs:outline-indigo-800 py-3 px-6 rounded-md"
+                >
+                  Sign Up
+                </button>
+              </div>
+              <p className="text-gray-300 text-sm text-center">
+                Already have an account?{" "}
+                <Link
+                  to="/login"
+                  className="text-indigo-500 hover:underline font-medium"
+                >
+                  Loing here
+                </Link>
+              </p>
+            </form>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+};
+
+export default Register;

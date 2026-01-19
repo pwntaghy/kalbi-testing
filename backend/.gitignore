@@ -1,0 +1,9 @@
+# Environment variables
+.env
+
+# Node modules (all levels)
+node_modules/
+
+dist/
+build/
+coverage/
