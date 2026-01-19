@@ -1,24 +1,29 @@
-name: Deploy
+name: Auto Deploy Blue Green
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy to Server
+      - name: Deploy on Server
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.PORT }}
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            set -e
             cd ~/kalbi-testing
+
+            echo "🔄 Pull latest code"
             git pull origin main
-            docker-compose down
-            docker-compose up -d --build
+
+            echo "🐳 Build new images (no cache)"
+            docker-compose build --no-cache
+
+            echo "🚀 Start containers (zero-downtime style)"
+            docker-compose up -d
